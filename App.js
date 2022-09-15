@@ -1,71 +1,73 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View,Button } from 'react-native';
+import React from 'react';
+import { Button, StyleSheet, Text, View } from 'react-native';
 import { Audio } from 'expo-av';
 
+export default function App(){
+  const [recording, setRecording] = React.useState();
+  const [recordings, setRecordings] = React.useState([]);
+  const [message, setMessage] = React.useState([]);
 
-export default function App() {
-  const [recording, setRecording] = React. useState();
-  const [recordings , setRecordings] = React.useState({});
-  const [message, setMessage] = React.useState('');
-
-  async function startRacoding(){
+  async function startRecording(){
     try{
-      const permission = await Audio.requestPermissionAsync();
+      const permission = await Audio.requestPermissionsAsync();
 
-      if(permission.status ==="granted"){
+      if (permission.status === 'granted'){
         await Audio.setAudioModeAsync({
           allowsRecordingIOS:true,
           playsInSilentModeIOS:true,
         });
 
         const {recording} = await Audio.Recording.createAsync(
-          Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
+          Audio.RECODING_OPTIONS_PRESET_HIGH_QUALITY
         );
-
-        setRecording(recording);
+          setRecording(recording);
       }else{
-        setMessage("Please grant permission to app access Microphone")
+        setMessage("Please grant per to app to access microphone");
       }
-    } catch(err){
-      console.error('Failed to start recording',err);
+    }catch (err){
+      console.error('fail to start recording',err);
     }
   }
-
-  async function stopRecording() {
+  async function stopRecording(){
     setRecording(undefined);
-    await recording.StopAndUnloadAsync ();
+    await recording.stopAndUnloadAsync();
 
-    let updatedRecordings =[... recording];
-    const {sound, status} =await recording.createNewLoadedSoundAsync();
+    let updatedRecordings=[...recordings];
+    const{sound, status} = await recording.createNewLoadedSoundAsync();
     updatedRecordings.push({
       sound:sound,
       duration:getDurationFormatted(status.durationMillis),
-      file:recording.getURI()
+      file: recording.getURI()
     });
-
     setRecordings(updatedRecordings);
   }
 
   function getDurationFormatted(millis){
-    const minutes =millis/100/60
-    const minutesDisplay = Math.floor()
-    const seconds = Math.round ((minutes - minutesDisplay)*60);
-    const secondsDisplay = seconds < 10 ? `0${seconds}`: seconds;
-    return `${minutesDisplay}: ${secondsDisplay}`;
+    const minutes = millis/1000/60;
+    const minutesDisplay =Math.floor(minutes);
+    const seconds = Math.round((minutes-minutesDisplay)*60);
+    const secondsDisplay = seconds <30 ? `0${seconds}`:seconds;
+    return `${minutesDisplay}:${secondsDisplay}`;
   }
-
-  function getr
-
-
-
-  return (
+  function getRecordingLines(){
+    return recordings.map((recordingsLine,index)=>{
+      return(
+        <View key={index} style={styles.row}>
+          <Text style={styles.fill}>Recording{index+1}-{recordingsLine.duration}</Text>
+          <Button style={styles.button} onPress={() => recordingsLine.sound.replayAsync()} title="Play"></Button>
+        </View>
+      )
+    })
+  }
+  return(
     <View style={styles.container}>
       <Text>{message}</Text>
-      <Button
-      title={recording ? 'stop Recoding': 'Start Recording'}
-      onPress={recording ? stopRecording: StartRecording}
-      />
-      <StatusBar style="auto" />
+      <Button 
+      title={recording ? 'Stop Recording': 'Start Recording'}
+      onPress = {recording ? stopRecording : startRecording}/>
+      {getRecordingLines()}
+      <StatusBar style="auto"/>
     </View>
   );
 }
@@ -77,4 +79,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  fill: {
+    flex: 1,
+    margin: 16
+  },
+  button: {
+    margin: 16
+  }
 });
