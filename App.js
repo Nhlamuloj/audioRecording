@@ -2,6 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
 import { Audio } from 'expo-av';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 export default function App(){
   const [recording, setRecording] = React.useState();
@@ -43,19 +44,19 @@ export default function App(){
     setRecordings(updatedRecordings);
   }
 
-  function getDurationFormatted(millis){
-    const minutes = millis/1000/60;
+  function getDurationFormatted(milles){
+    const minutes = milles / 1000 / 60;
     const minutesDisplay =Math.floor(minutes);
     const seconds = Math.round((minutes-minutesDisplay)*60);
-    const secondsDisplay = seconds <30 ? `0${seconds}`:seconds;
+    const secondsDisplay = seconds < 10 ? `0${seconds}` : seconds;
     return `${minutesDisplay}:${secondsDisplay}`;
   }
   function getRecordingLines(){
-    return recordings.map((recordingsLine,index)=>{
+    return recordings.map((recordingLine, index)=>{
       return(
-        <View key={index} style={styles.row}>
-          <Text style={styles.fill}>Recording{index+1}-{recordingsLine.duration}</Text>
-          <Button style={styles.button} onPress={() => recordingsLine.sound.replayAsync()} title="Play"></Button>
+        <View key={index} style={styles.line}>
+          <Text style={styles.fill}>Recording{index + 1}-{recordingLine.duration}</Text>
+          <Button style={styles.button} onPress={() => recordingLine.sound.replayAsync()} title="Play"></Button>
         </View>
       )
     })
@@ -75,11 +76,11 @@ export default function App(){
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: 'lightblue',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  row: {
+  line: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -89,6 +90,7 @@ const styles = StyleSheet.create({
     margin: 16
   },
   button: {
-    margin: 16
+    margin: 16,
+    Color:"blue"
   }
 });
